@@ -1,0 +1,18 @@
+{
+  "name": "ttokbaro",
+  "private": true,
+  "version": "1.0.0",
+  "description": "똑바로해라 프로젝트 모노레포",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "workspaces": [
+    "web",
+    "api",
+    "packages/*"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.17.1"
+}
