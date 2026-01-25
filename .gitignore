@@ -25,3 +25,6 @@ api/target
 
 # OS
 .DS_Store
+
+# Spring Initializr help
+api/HELP.md
