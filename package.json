@@ -4,7 +4,10 @@
   "version": "1.0.0",
   "description": "똑바로해라 프로젝트 모노레포",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:web": "pnpm --filter web dev",
+    "build:web": "pnpm --filter web build",
+    "lint:web": "pnpm --filter web lint"
   },
   "workspaces": [
     "web",

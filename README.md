@@ -50,23 +50,54 @@
 
 ## 🛠 실행 방법
 
-### Frontend
+### 1) Backend (Spring Boot)
+<pre><code>cd api
+./gradlew clean test
+./gradlew bootRun   # → http://localhost:8080
+</code></pre>
+
+✅ 동작 확인
+<pre><code>curl -s "http://localhost:8080/claims?limit=5"
+</code></pre>
+
+<hr/>
+
+### 2) Frontend
 <pre><code>cd web
 pnpm install
 pnpm dev   # → http://localhost:3000
 </code></pre>
 
-### Backend (Spring Boot)
-<pre><code>cd api
-./gradlew bootRun   # → http://localhost:8080
+✅ 환경변수 설정 (web/.env.local)
+<pre><code>NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
 </code></pre>
+
+✅ 제출 화면
+- http://localhost:3000/submit
+
+<hr/>
+
+### 3) Quick Test (E2E)
+<pre><code># Claim 생성
+curl -X POST http://localhost:8080/claims \
+  -H "Content-Type: application/json" \
+  -d '{"sourceUrl":"https://example.com/abc","text":"웹에서 첫 제출 테스트"}'
+
+# 최신 Claim 조회
+curl -s "http://localhost:8080/claims?limit=5"
+</code></pre>
+
+## 🔌 API (현재 구현)
+- `POST /claims` : Claim 생성 (sourceUrl/text 중 하나 필수)
+- `GET /claims?limit=N` : 최신 Claim N개 조회
 
 <hr/>
 
 ## 📝 개발 로그
-- 0화: 프로젝트 시작, 환경 세팅 & 첫 페이지 — (티스토리 링크 삽입)  
-- 1화: (예정) Claim API & 프론트 연동  
-- 2화: (예정) 피드 페이지 & 리스트 출력
+- Day0: 프로젝트 시작, 모노레포/환경 세팅 & 첫 페이지 — https://hundoblog.tistory.com/35
+- Day1: (예정) Claim API 골격 & DB 연결 시도
+- Day2: Claim API + CORS + Web Submit 연동 완료 (POST/GET + E2E 검증) — https://hundoblog.tistory.com/36
+- Day3: (예정) /claims 피드 페이지(리스트) + 상태값(status) 도입
 
 <hr/>
 
