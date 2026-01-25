@@ -94,7 +94,7 @@ curl -s "http://localhost:8080/claims?limit=5"
 <hr/>
 
 ## 📝 개발 로그
-- Day0: 프로젝트 시작, 모노레포/환경 세팅 & 첫 페이지 — (티스토리 링크 삽입)
+- Day0: 프로젝트 시작, 모노레포/환경 세팅 & 첫 페이지 — https://hundoblog.tistory.com/35
 - Day1: (예정) Claim API 골격 & DB 연결 시도
 - Day2: Claim API + CORS + Web Submit 연동 완료 (POST/GET + E2E 검증) — https://hundoblog.tistory.com/36
 - Day3: (예정) /claims 피드 페이지(리스트) + 상태값(status) 도입
