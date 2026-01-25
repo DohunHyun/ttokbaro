@@ -5,3 +5,23 @@ dist
 .env
 *.log
 api/target
+
+# IDE
+.idea/
+
+# Gradle
+**/.gradle/
+**/build/
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+
+# Gradle cache & build outputs
+**/.gradle/
+**/build/
+
+# OS
+.DS_Store
