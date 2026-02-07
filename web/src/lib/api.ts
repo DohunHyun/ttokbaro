@@ -8,6 +8,14 @@ export type Claim = {
   createdAt: string;
 };
 
+export type Evidence = {
+  id: number;
+  claimId: number;
+  url: string | null;
+  note: string | null;
+  createdAt: string;
+};
+
 export class ApiError extends Error {
   status: number;
 
@@ -65,6 +73,46 @@ export async function fetchClaimById(id: number): Promise<Claim> {
   }
 
   return body as Claim;
+}
+
+export async function fetchEvidencesByClaimId(
+  claimId: number
+): Promise<Evidence[]> {
+  const response = await fetch(`${API_BASE_URL}/claims/${claimId}/evidences`, {
+    headers: { "Content-Type": "application/json" },
+    cache: "no-store",
+  });
+
+  const body = await safeJson(response);
+  if (!response.ok) {
+    const message =
+      (body as { message?: string } | null)?.message ??
+      "근거 목록을 불러오지 못했습니다.";
+    throw new ApiError(message, response.status);
+  }
+
+  return body as Evidence[];
+}
+
+export async function createEvidence(
+  claimId: number,
+  payload: { url?: string; note?: string }
+): Promise<Evidence> {
+  const response = await fetch(`${API_BASE_URL}/claims/${claimId}/evidences`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  const body = await safeJson(response);
+  if (!response.ok) {
+    const message =
+      (body as { message?: string } | null)?.message ??
+      "근거를 추가하지 못했습니다.";
+    throw new ApiError(message, response.status);
+  }
+
+  return body as Evidence;
 }
 
 async function safeJson(response: Response) {
