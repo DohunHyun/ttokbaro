@@ -39,6 +39,13 @@ public class ClaimService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public CreateClaimResponse getById(Long id) {
+        Claim claim = claimRepository.findById(id)
+                .orElseThrow(() -> new ClaimNotFoundException(id));
+        return CreateClaimResponse.from(claim);
+    }
+
     private int resolveLimit(Integer limit) {
         if (limit == null || limit <= 0) {
             return DEFAULT_LIMIT;

@@ -2,9 +2,11 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createClaim } from "../../lib/api";
 
 export default function SubmitPage() {
+  const router = useRouter();
   const [url, setUrl] = useState("");
   const [text, setText] = useState("");
   const [status, setStatus] = useState<
@@ -24,9 +26,7 @@ export default function SubmitPage() {
       });
 
       setStatus("success");
-      setMessage("제출이 완료되었습니다.");
-      setUrl("");
-      setText("");
+      router.push("/claims");
     } catch (error) {
       setStatus("error");
       setMessage(
@@ -83,7 +83,7 @@ export default function SubmitPage() {
       )}
 
       <p className="text-sm text-gray-600">
-        최근 주장 목록은 <Link href="/">메인 페이지</Link>에서 확인할 수 있어요.
+        최근 주장 목록은 <Link href="/claims">Claims 페이지</Link>에서 확인할 수 있어요.
       </p>
     </div>
   );

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "똑바로해라",
+  title: "똑바로",
   description: "팩트체크 & 편향 검증 커뮤니티",
 };
 
@@ -13,9 +13,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className="min-h-screen bg-gray-50 text-gray-900">
-        <header className="w-full px-6 py-4 border-b bg-white flex justify-between items-center">
-          <h1 className="text-xl font-bold">똑바로해라</h1>
+      <body className="min-h-screen bg-slate-50 text-slate-900">
+        <header className="w-full border-b border-slate-200 bg-white px-6 py-4 flex items-center justify-between">
+          <h1 className="text-xl font-semibold text-slate-900">똑바로</h1>
           <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded">
             로그인
           </button>
