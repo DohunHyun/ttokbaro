@@ -41,6 +41,13 @@ public class EvidenceService {
                 .toList();
     }
 
+    @Transactional
+    public void deleteEvidence(Long evidenceId) {
+        Evidence evidence = evidenceRepository.findById(evidenceId)
+                .orElseThrow(() -> new EvidenceNotFoundException(evidenceId));
+        evidenceRepository.delete(evidence);
+    }
+
     private Claim getClaimOrThrow(Long claimId) {
         return claimRepository.findById(claimId)
                 .orElseThrow(() -> new ClaimNotFoundException(claimId));

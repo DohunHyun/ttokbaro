@@ -8,6 +8,7 @@ import {
   Claim,
   Evidence,
   createEvidence,
+  deleteEvidence,
   fetchClaimById,
   fetchEvidencesByClaimId,
 } from "../../../lib/api";
@@ -37,7 +38,11 @@ export default function ClaimDetailPage() {
   const [url, setUrl] = useState("");
   const [note, setNote] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isSubmittingEvidence, setIsSubmittingEvidence] = useState(false);
+  const [deletingEvidenceId, setDeletingEvidenceId] = useState<number | null>(
+    null
+  );
 
   const loadClaim = useCallback(async () => {
     if (!Number.isFinite(id) || id <= 0) {
@@ -116,6 +121,7 @@ export default function ClaimDetailPage() {
       });
       setUrl("");
       setNote("");
+      setDeleteError(null);
       await loadEvidences();
     } catch (err) {
       setFormError(
@@ -125,6 +131,26 @@ export default function ClaimDetailPage() {
       );
     } finally {
       setIsSubmittingEvidence(false);
+    }
+  };
+
+  const handleDeleteEvidence = async (evidenceId: number) => {
+    const confirmed = window.confirm("이 근거를 삭제할까요?");
+    if (!confirmed) return;
+
+    setDeletingEvidenceId(evidenceId);
+    setDeleteError(null);
+    try {
+      await deleteEvidence(evidenceId);
+      setEvidences((prev) => prev.filter((item) => item.id !== evidenceId));
+    } catch (err) {
+      setDeleteError(
+        err instanceof Error
+          ? err.message
+          : "근거를 삭제하는 중 오류가 발생했습니다."
+      );
+    } finally {
+      setDeletingEvidenceId(null);
     }
   };
 
@@ -232,6 +258,16 @@ export default function ClaimDetailPage() {
                     key={evidence.id}
                     className="space-y-2 rounded-md border border-slate-200 bg-slate-50 p-3"
                   >
+                    <div className="flex items-center justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteEvidence(evidence.id)}
+                        disabled={deletingEvidenceId === evidence.id}
+                        className="rounded border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-60"
+                      >
+                        {deletingEvidenceId === evidence.id ? "삭제 중..." : "삭제"}
+                      </button>
+                    </div>
                     {evidence.url && (
                       <a
                         href={evidence.url}
@@ -254,6 +290,7 @@ export default function ClaimDetailPage() {
                 ))}
               </ul>
             )}
+            {deleteError && <p className="text-sm text-red-600">{deleteError}</p>}
           </section>
         </>
       )}

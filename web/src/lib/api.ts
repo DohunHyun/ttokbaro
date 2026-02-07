@@ -115,6 +115,21 @@ export async function createEvidence(
   return body as Evidence;
 }
 
+export async function deleteEvidence(evidenceId: number): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/evidences/${evidenceId}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  const body = await safeJson(response);
+  if (!response.ok) {
+    const message =
+      (body as { message?: string } | null)?.message ??
+      "근거를 삭제하지 못했습니다.";
+    throw new ApiError(message, response.status);
+  }
+}
+
 async function safeJson(response: Response) {
   try {
     return await response.json();
