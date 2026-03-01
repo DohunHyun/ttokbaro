@@ -28,3 +28,7 @@ api/target
 
 # Spring Initializr help
 api/HELP.md
+
+# local secrets
+api/src/main/resources/application-local.yml
+**/application-local.yml
