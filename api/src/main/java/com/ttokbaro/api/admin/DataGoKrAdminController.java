@@ -1,10 +1,12 @@
 package com.ttokbaro.api.admin;
 
+import com.ttokbaro.api.candidate.CandidateIngestionService;
 import com.ttokbaro.api.datago.DataGoKrClient;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,9 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class DataGoKrAdminController {
 
     private final DataGoKrClient dataGoKrClient;
+    private final CandidateIngestionService candidateIngestionService;
 
-    public DataGoKrAdminController(DataGoKrClient dataGoKrClient) {
+    public DataGoKrAdminController(
+            DataGoKrClient dataGoKrClient,
+            CandidateIngestionService candidateIngestionService
+    ) {
         this.dataGoKrClient = dataGoKrClient;
+        this.candidateIngestionService = candidateIngestionService;
     }
 
     @GetMapping("/sg-codes")
@@ -56,5 +63,13 @@ public class DataGoKrAdminController {
                 "/9760000/PofelcddInfoInqireService/getPoelpcddRegistSttusInfoInqire",
                 queryParams
         );
+    }
+
+    @PostMapping("/sync/candidates/seoul")
+    public CandidateIngestionService.SyncSummary syncSeoulCandidates(
+            @RequestParam(defaultValue = "20260603") String sgId,
+            @RequestParam(defaultValue = "3") Integer sgTypecode
+    ) {
+        return candidateIngestionService.fetchAndUpsertSeoulCandidates(sgId, sgTypecode);
     }
 }
