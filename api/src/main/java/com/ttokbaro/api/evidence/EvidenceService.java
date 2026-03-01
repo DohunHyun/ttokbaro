@@ -53,6 +53,13 @@ public class EvidenceService {
                 .orElseThrow(() -> new ClaimNotFoundException(claimId));
     }
 
+    private void validateParentEvidenceBelongsToClaim(Long claimId, Long parentEvidenceId) {
+        if (parentEvidenceId == null) {
+            return;
+        }
+        // TODO: enforce parent evidence existence and same-claim ownership before enabling parentEvidenceId create flow.
+    }
+
     private String trimToNull(String value) {
         if (value == null) {
             return null;

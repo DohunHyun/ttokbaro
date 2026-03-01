@@ -24,6 +24,10 @@ public class Evidence {
     @JoinColumn(name = "claim_id", nullable = false)
     private Claim claim;
 
+    @ManyToOne
+    @JoinColumn(name = "parent_evidence_id")
+    private Evidence parentEvidence;
+
     @Column(length = 2048)
     private String url;
 
@@ -36,14 +40,19 @@ public class Evidence {
     protected Evidence() {
     }
 
-    private Evidence(Claim claim, String url, String note) {
+    private Evidence(Claim claim, Evidence parentEvidence, String url, String note) {
         this.claim = claim;
+        this.parentEvidence = parentEvidence;
         this.url = url;
         this.note = note;
     }
 
     public static Evidence of(Claim claim, String url, String note) {
-        return new Evidence(claim, url, note);
+        return new Evidence(claim, null, url, note);
+    }
+
+    public static Evidence of(Claim claim, Evidence parentEvidence, String url, String note) {
+        return new Evidence(claim, parentEvidence, url, note);
     }
 
     @PrePersist
@@ -57,6 +66,10 @@ public class Evidence {
 
     public Claim getClaim() {
         return claim;
+    }
+
+    public Evidence getParentEvidence() {
+        return parentEvidence;
     }
 
     public String getUrl() {
