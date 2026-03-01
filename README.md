@@ -91,6 +91,12 @@ curl -s "http://localhost:8080/claims?limit=5"
 - `POST /claims` : Claim 생성 (sourceUrl/text 중 하나 필수)
 - `GET /claims?limit=N` : 최신 Claim N개 조회
 
+### data.go.kr 로컬 프로브 노트
+- NEC 공통 선거코드 조회 기준, 현재 최신 선거일 코드는 `sgId=20260603` 확인.
+- 로컬 프로필에서 후보 조회 테스트:
+<pre><code>curl "http://localhost:8080/admin/datago/candidates/seoul?sgTypecode=3"
+</code></pre>
+
 <hr/>
 
 ## 📝 개발 로그
