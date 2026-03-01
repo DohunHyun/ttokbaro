@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import {
   ApiError,
   Claim,
@@ -191,16 +191,33 @@ export default function ClaimDetailPage() {
     }
   };
 
-  const rootEvidences = evidences.filter((e) => e.parentEvidenceId == null);
-  const childrenByParentId = evidences.reduce<Record<number, Evidence[]>>(
-    (acc, e) => {
-      if (e.parentEvidenceId != null) {
-        (acc[e.parentEvidenceId] ??= []).push(e);
-      }
-      return acc;
-    },
-    {}
+  const sortedEvidences = useMemo(
+    () =>
+      [...evidences].sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      ),
+    [evidences]
   );
+
+  const rootEvidences = useMemo(
+    () => sortedEvidences.filter((e) => e.parentEvidenceId === null),
+    [sortedEvidences]
+  );
+
+  const repliesByParent = useMemo(() => {
+    const grouped = new Map<number, Evidence[]>();
+    for (const evidence of sortedEvidences) {
+      if (evidence.parentEvidenceId === null) {
+        continue;
+      }
+      const parentId = evidence.parentEvidenceId;
+      const replies = grouped.get(parentId) ?? [];
+      replies.push(evidence);
+      grouped.set(parentId, replies);
+    }
+    return grouped;
+  }, [sortedEvidences]);
 
   return (
     <section className="mx-auto max-w-3xl space-y-6">
@@ -303,7 +320,7 @@ export default function ClaimDetailPage() {
               <ul className="space-y-3">
                 {rootEvidences.map((evidence) => (
                   <li key={evidence.id} className="space-y-2">
-                    <div className="space-y-2 rounded-md border border-slate-200 bg-slate-50 p-3">
+                    <div className="space-y-2 rounded-md border border-slate-200 bg-white p-3">
                       <div className="flex items-center justify-end gap-2">
                         <button
                           type="button"
@@ -385,41 +402,48 @@ export default function ClaimDetailPage() {
                       </form>
                     )}
 
-                    {(childrenByParentId[evidence.id] ?? []).map((child) => (
-                      <div
-                        key={child.id}
-                        className="ml-6 space-y-2 rounded-md border border-slate-200 bg-white p-3"
-                      >
-                        <div className="flex items-center justify-end">
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteEvidence(child.id)}
-                            disabled={deletingEvidenceId === child.id}
-                            className="rounded border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-60"
+                    {(repliesByParent.get(evidence.id) ?? []).length > 0 && (
+                      <div className="mt-3 border-l-2 border-slate-200 pl-6">
+                        {(repliesByParent.get(evidence.id) ?? []).map((child) => (
+                          <div
+                            key={child.id}
+                            className="mb-2 space-y-2 rounded-md border border-slate-200 bg-slate-50 p-3 last:mb-0"
                           >
-                            {deletingEvidenceId === child.id ? "삭제 중..." : "삭제"}
-                          </button>
-                        </div>
-                        {child.url && (
-                          <a
-                            href={child.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="block break-words text-sm text-blue-700 hover:underline"
-                          >
-                            {getHostname(child.url)}
-                          </a>
-                        )}
-                        {child.note && (
-                          <p className="whitespace-pre-line text-sm text-slate-800">
-                            {child.note}
-                          </p>
-                        )}
-                        <p className="text-xs text-slate-500">
-                          {new Date(child.createdAt).toLocaleString("ko-KR")}
-                        </p>
+                            <div className="flex items-center justify-between">
+                              <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+                                답글
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteEvidence(child.id)}
+                                disabled={deletingEvidenceId === child.id}
+                                className="rounded border border-slate-300 bg-white px-1.5 py-0.5 text-[11px] font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-60"
+                              >
+                                {deletingEvidenceId === child.id ? "삭제 중..." : "삭제"}
+                              </button>
+                            </div>
+                            {child.url && (
+                              <a
+                                href={child.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="block break-words text-sm text-blue-700 hover:underline"
+                              >
+                                {getHostname(child.url)}
+                              </a>
+                            )}
+                            {child.note && (
+                              <p className="whitespace-pre-line text-sm text-slate-800">
+                                {child.note}
+                              </p>
+                            )}
+                            <p className="text-xs text-slate-500">
+                              {new Date(child.createdAt).toLocaleString("ko-KR")}
+                            </p>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </li>
                 ))}
               </ul>

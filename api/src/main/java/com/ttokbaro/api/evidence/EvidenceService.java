@@ -61,7 +61,7 @@ public class EvidenceService {
         Evidence parent = evidenceRepository.findById(parentEvidenceId)
                 .orElseThrow(() -> new EvidenceNotFoundException(parentEvidenceId));
         if (!parent.getClaim().getId().equals(claimId)) {
-            throw new IllegalArgumentException("Parent evidence does not belong to the specified claim");
+            throw new IllegalArgumentException("Parent evidence must belong to same claim");
         }
         return parent;
     }
