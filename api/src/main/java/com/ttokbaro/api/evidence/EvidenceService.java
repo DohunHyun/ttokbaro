@@ -20,7 +20,7 @@ public class EvidenceService {
     }
 
     @Transactional
-    public EvidenceResponse createEvidence(Long claimId, String url, String note) {
+    public EvidenceResponse createEvidence(Long claimId, Long parentEvidenceId, String url, String note) {
         String normalizedUrl = trimToNull(url);
         String normalizedNote = trimToNull(note);
         if (normalizedUrl == null && normalizedNote == null) {
@@ -28,7 +28,8 @@ public class EvidenceService {
         }
 
         Claim claim = getClaimOrThrow(claimId);
-        Evidence saved = evidenceRepository.save(Evidence.of(claim, normalizedUrl, normalizedNote));
+        Evidence parentEvidence = resolveParentEvidence(claimId, parentEvidenceId);
+        Evidence saved = evidenceRepository.save(Evidence.of(claim, parentEvidence, normalizedUrl, normalizedNote));
         return EvidenceResponse.from(saved);
     }
 
@@ -53,11 +54,16 @@ public class EvidenceService {
                 .orElseThrow(() -> new ClaimNotFoundException(claimId));
     }
 
-    private void validateParentEvidenceBelongsToClaim(Long claimId, Long parentEvidenceId) {
+    private Evidence resolveParentEvidence(Long claimId, Long parentEvidenceId) {
         if (parentEvidenceId == null) {
-            return;
+            return null;
         }
-        // TODO: enforce parent evidence existence and same-claim ownership before enabling parentEvidenceId create flow.
+        Evidence parent = evidenceRepository.findById(parentEvidenceId)
+                .orElseThrow(() -> new EvidenceNotFoundException(parentEvidenceId));
+        if (!parent.getClaim().getId().equals(claimId)) {
+            throw new IllegalArgumentException("Parent evidence does not belong to the specified claim");
+        }
+        return parent;
     }
 
     private String trimToNull(String value) {

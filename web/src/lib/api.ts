@@ -11,6 +11,7 @@ export type Claim = {
 export type Evidence = {
   id: number;
   claimId: number;
+  parentEvidenceId: number | null;
   url: string | null;
   note: string | null;
   createdAt: string;
@@ -96,7 +97,7 @@ export async function fetchEvidencesByClaimId(
 
 export async function createEvidence(
   claimId: number,
-  payload: { url?: string; note?: string }
+  payload: { parentEvidenceId?: number; url?: string; note?: string }
 ): Promise<Evidence> {
   const response = await fetch(`${API_BASE_URL}/claims/${claimId}/evidences`, {
     method: "POST",

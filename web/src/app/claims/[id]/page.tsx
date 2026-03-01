@@ -43,6 +43,11 @@ export default function ClaimDetailPage() {
   const [deletingEvidenceId, setDeletingEvidenceId] = useState<number | null>(
     null
   );
+  const [replyingToId, setReplyingToId] = useState<number | null>(null);
+  const [replyUrl, setReplyUrl] = useState("");
+  const [replyNote, setReplyNote] = useState("");
+  const [replyFormError, setReplyFormError] = useState<string | null>(null);
+  const [isSubmittingReply, setIsSubmittingReply] = useState(false);
 
   const loadClaim = useCallback(async () => {
     if (!Number.isFinite(id) || id <= 0) {
@@ -154,6 +159,49 @@ export default function ClaimDetailPage() {
     }
   };
 
+  const handleReplySubmit = async (parentId: number, e: FormEvent) => {
+    e.preventDefault();
+    const normalizedUrl = replyUrl.trim();
+    const normalizedNote = replyNote.trim();
+    if (!normalizedUrl && !normalizedNote) {
+      setReplyFormError("URL 또는 메모를 입력해주세요.");
+      return;
+    }
+
+    setIsSubmittingReply(true);
+    setReplyFormError(null);
+    try {
+      await createEvidence(id, {
+        parentEvidenceId: parentId,
+        url: normalizedUrl || undefined,
+        note: normalizedNote || undefined,
+      });
+      setReplyUrl("");
+      setReplyNote("");
+      setReplyingToId(null);
+      await loadEvidences();
+    } catch (err) {
+      setReplyFormError(
+        err instanceof Error
+          ? err.message
+          : "답글 근거를 추가하는 중 오류가 발생했습니다."
+      );
+    } finally {
+      setIsSubmittingReply(false);
+    }
+  };
+
+  const rootEvidences = evidences.filter((e) => e.parentEvidenceId == null);
+  const childrenByParentId = evidences.reduce<Record<number, Evidence[]>>(
+    (acc, e) => {
+      if (e.parentEvidenceId != null) {
+        (acc[e.parentEvidenceId] ??= []).push(e);
+      }
+      return acc;
+    },
+    {}
+  );
+
   return (
     <section className="mx-auto max-w-3xl space-y-6">
       <header className="rounded-xl border border-slate-200 bg-slate-50 p-5">
@@ -251,41 +299,127 @@ export default function ClaimDetailPage() {
             {evidenceStatus === "ready" && evidences.length === 0 && (
               <p className="text-sm text-slate-600">아직 등록된 근거가 없습니다.</p>
             )}
-            {evidenceStatus === "ready" && evidences.length > 0 && (
+            {evidenceStatus === "ready" && rootEvidences.length > 0 && (
               <ul className="space-y-3">
-                {evidences.map((evidence) => (
-                  <li
-                    key={evidence.id}
-                    className="space-y-2 rounded-md border border-slate-200 bg-slate-50 p-3"
-                  >
-                    <div className="flex items-center justify-end">
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteEvidence(evidence.id)}
-                        disabled={deletingEvidenceId === evidence.id}
-                        className="rounded border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-60"
-                      >
-                        {deletingEvidenceId === evidence.id ? "삭제 중..." : "삭제"}
-                      </button>
-                    </div>
-                    {evidence.url && (
-                      <a
-                        href={evidence.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="block break-words text-sm text-blue-700 hover:underline"
-                      >
-                        {getHostname(evidence.url)}
-                      </a>
-                    )}
-                    {evidence.note && (
-                      <p className="whitespace-pre-line text-sm text-slate-800">
-                        {evidence.note}
+                {rootEvidences.map((evidence) => (
+                  <li key={evidence.id} className="space-y-2">
+                    <div className="space-y-2 rounded-md border border-slate-200 bg-slate-50 p-3">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (replyingToId === evidence.id) {
+                              setReplyingToId(null);
+                              setReplyUrl("");
+                              setReplyNote("");
+                              setReplyFormError(null);
+                            } else {
+                              setReplyingToId(evidence.id);
+                              setReplyUrl("");
+                              setReplyNote("");
+                              setReplyFormError(null);
+                            }
+                          }}
+                          className="rounded border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100"
+                        >
+                          {replyingToId === evidence.id ? "취소" : "답글 근거 추가"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteEvidence(evidence.id)}
+                          disabled={deletingEvidenceId === evidence.id}
+                          className="rounded border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-60"
+                        >
+                          {deletingEvidenceId === evidence.id ? "삭제 중..." : "삭제"}
+                        </button>
+                      </div>
+                      {evidence.url && (
+                        <a
+                          href={evidence.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="block break-words text-sm text-blue-700 hover:underline"
+                        >
+                          {getHostname(evidence.url)}
+                        </a>
+                      )}
+                      {evidence.note && (
+                        <p className="whitespace-pre-line text-sm text-slate-800">
+                          {evidence.note}
+                        </p>
+                      )}
+                      <p className="text-xs text-slate-500">
+                        {new Date(evidence.createdAt).toLocaleString("ko-KR")}
                       </p>
+                    </div>
+
+                    {replyingToId === evidence.id && (
+                      <form
+                        onSubmit={(e) => handleReplySubmit(evidence.id, e)}
+                        className="ml-6 space-y-2 rounded-md border border-blue-200 bg-blue-50 p-3"
+                      >
+                        <input
+                          type="url"
+                          value={replyUrl}
+                          onChange={(e) => setReplyUrl(e.target.value)}
+                          placeholder="https://example.com"
+                          className="w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-blue-500/30"
+                        />
+                        <textarea
+                          value={replyNote}
+                          onChange={(e) => setReplyNote(e.target.value)}
+                          placeholder="답글 메모를 입력하세요"
+                          rows={2}
+                          className="w-full rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-blue-500/30"
+                        />
+                        <button
+                          type="submit"
+                          disabled={isSubmittingReply}
+                          className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-60"
+                        >
+                          {isSubmittingReply ? "추가 중..." : "답글 추가"}
+                        </button>
+                        {replyFormError && (
+                          <p className="text-sm text-red-600">{replyFormError}</p>
+                        )}
+                      </form>
                     )}
-                    <p className="text-xs text-slate-500">
-                      {new Date(evidence.createdAt).toLocaleString("ko-KR")}
-                    </p>
+
+                    {(childrenByParentId[evidence.id] ?? []).map((child) => (
+                      <div
+                        key={child.id}
+                        className="ml-6 space-y-2 rounded-md border border-slate-200 bg-white p-3"
+                      >
+                        <div className="flex items-center justify-end">
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteEvidence(child.id)}
+                            disabled={deletingEvidenceId === child.id}
+                            className="rounded border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-60"
+                          >
+                            {deletingEvidenceId === child.id ? "삭제 중..." : "삭제"}
+                          </button>
+                        </div>
+                        {child.url && (
+                          <a
+                            href={child.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="block break-words text-sm text-blue-700 hover:underline"
+                          >
+                            {getHostname(child.url)}
+                          </a>
+                        )}
+                        {child.note && (
+                          <p className="whitespace-pre-line text-sm text-slate-800">
+                            {child.note}
+                          </p>
+                        )}
+                        <p className="text-xs text-slate-500">
+                          {new Date(child.createdAt).toLocaleString("ko-KR")}
+                        </p>
+                      </div>
+                    ))}
                   </li>
                 ))}
               </ul>

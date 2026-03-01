@@ -28,7 +28,7 @@ public class EvidenceController {
             @PathVariable Long claimId,
             @RequestBody CreateEvidenceRequest request
     ) {
-        return evidenceService.createEvidence(claimId, request.url(), request.note());
+        return evidenceService.createEvidence(claimId, request.parentEvidenceId(), request.url(), request.note());
     }
 
     @GetMapping
