@@ -87,6 +87,10 @@ curl -X POST http://localhost:8080/claims \
 curl -s "http://localhost:8080/claims?limit=5"
 </code></pre>
 
+### Candidates (서울시장 후보) API
+- 후보 동기화(로컬/개발용): `POST /admin/datago/sync/candidates/seoul?sgTypecode=3`
+- 후보 조회: `GET /candidates/seoul/mayor`
+
 ## 🔌 API (현재 구현)
 - `POST /claims` : Claim 생성 (sourceUrl/text 중 하나 필수)
 - `GET /claims?limit=N` : 최신 Claim N개 조회
@@ -103,6 +107,7 @@ curl -s "http://localhost:8080/claims?limit=5"
 - Day0: 프로젝트 시작, 환경 세팅 & 로컬 구동 — https://hundoblog.tistory.com/35
 - Day1: Claim API + Submit/Feed UI + 상세 페이지 — (https://hundoblog.tistory.com/36
 - Day2: Evidence(근거) 추가/조회 + 삭제 기능 — https://hundoblog.tistory.com/37
+- Day3: Evidence 답글(스레드) + data.go.kr 연동(서울시장 후보 적재) - 
 
 <hr/>
 
