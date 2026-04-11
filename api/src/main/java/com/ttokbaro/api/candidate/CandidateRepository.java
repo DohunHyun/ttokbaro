@@ -15,4 +15,6 @@ public interface CandidateRepository extends JpaRepository<Candidate, Long> {
     );
 
     List<Candidate> findBySdNameAndSgTypecodeOrderByUpdatedAtDescNameAsc(String sdName, Integer sgTypecode);
+
+    long countBySdNameAndSgTypecode(String sdName, Integer sgTypecode);
 }

@@ -91,6 +91,10 @@ public class Candidate {
         return sdName;
     }
 
+    public String getSgId() {
+        return sgId;
+    }
+
     public Integer getSgTypecode() {
         return sgTypecode;
     }
@@ -105,6 +109,10 @@ public class Candidate {
 
     public String getPartyName() {
         return partyName;
+    }
+
+    public String getRawXml() {
+        return rawXml;
     }
 
     public Instant getUpdatedAt() {

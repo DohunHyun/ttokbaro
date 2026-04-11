@@ -89,6 +89,22 @@ public class CandidateIngestionService {
         return candidateRepository.findBySdNameAndSgTypecodeOrderByUpdatedAtDescNameAsc(SEOUL, 3);
     }
 
+    @Transactional(readOnly = true)
+    public List<Candidate> getSeoulCandidatesBySgTypecode(Integer sgTypecode) {
+        return candidateRepository.findBySdNameAndSgTypecodeOrderByUpdatedAtDescNameAsc(SEOUL, sgTypecode);
+    }
+
+    @Transactional(readOnly = true)
+    public long countSeoulCandidatesBySgTypecode(Integer sgTypecode) {
+        return candidateRepository.countBySdNameAndSgTypecode(SEOUL, sgTypecode);
+    }
+
+    @Transactional(readOnly = true)
+    public Candidate getCandidateById(Long id) {
+        return candidateRepository.findById(id)
+                .orElseThrow(() -> new CandidateNotFoundException(id));
+    }
+
     private List<ParsedCandidate> parseCandidateItems(String rawXml) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

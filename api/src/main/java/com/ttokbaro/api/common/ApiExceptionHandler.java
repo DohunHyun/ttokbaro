@@ -1,5 +1,6 @@
 package com.ttokbaro.api.common;
 
+import com.ttokbaro.api.candidate.CandidateNotFoundException;
 import com.ttokbaro.api.claim.ClaimNotFoundException;
 import com.ttokbaro.api.evidence.EvidenceNotFoundException;
 import java.util.Map;
@@ -26,6 +27,12 @@ public class ApiExceptionHandler {
     @ExceptionHandler(EvidenceNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleEvidenceNotFound(EvidenceNotFoundException ex) {
         String message = ex.getMessage() == null ? "Evidence not found" : ex.getMessage();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", message));
+    }
+
+    @ExceptionHandler(CandidateNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleCandidateNotFound(CandidateNotFoundException ex) {
+        String message = ex.getMessage() == null ? "Candidate not found" : ex.getMessage();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", message));
     }
 }
