@@ -70,7 +70,12 @@ class DashboardHttpIntegrationTest {
         assertThat(response.body()).contains("\"label\":\"서울특별시장\"");
         assertThat(response.body()).contains("\"candidateCount\":2");
         assertThat(response.body()).contains("\"available\":true");
+        assertThat(response.body()).contains("\"electionType\":\"SUPERINTENDENT\"");
         assertThat(response.body()).contains("\"electionType\":\"DISTRICT_HEAD\"");
+        assertThat(response.body()).contains("\"electionType\":\"CITY_COUNCIL_DISTRICT\"");
+        assertThat(response.body()).contains("\"electionType\":\"CITY_COUNCIL_PR\"");
+        assertThat(response.body()).contains("\"electionType\":\"DISTRICT_COUNCIL_DISTRICT\"");
+        assertThat(response.body()).contains("\"electionType\":\"DISTRICT_COUNCIL_PR\"");
         assertThat(response.body()).contains("\"candidateCount\":0");
         assertThat(response.body()).contains("\"available\":false");
     }

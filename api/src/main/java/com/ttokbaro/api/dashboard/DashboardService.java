@@ -33,10 +33,13 @@ public class DashboardService {
         );
 
         return List.of(
+                toResponse(DashboardElectionType.SUPERINTENDENT.getValue(), "서울특별시교육감", 0),
                 toResponse(DashboardElectionType.MAYOR.getValue(), "서울특별시장", mayorCandidateCount),
                 toResponse(DashboardElectionType.DISTRICT_HEAD.getValue(), "구청장", 0),
-                toResponse(DashboardElectionType.CITY_COUNCIL.getValue(), "서울시의원", 0),
-                toResponse(DashboardElectionType.DISTRICT_COUNCIL.getValue(), "구의원", 0)
+                toResponse(DashboardElectionType.CITY_COUNCIL_DISTRICT.getValue(), "지역구 서울시의원", 0),
+                toResponse(DashboardElectionType.CITY_COUNCIL_PR.getValue(), "비례대표 서울시의원", 0),
+                toResponse(DashboardElectionType.DISTRICT_COUNCIL_DISTRICT.getValue(), "지역구 구의원", 0),
+                toResponse(DashboardElectionType.DISTRICT_COUNCIL_PR.getValue(), "비례대표 구의원", 0)
         );
     }
 
@@ -255,7 +258,8 @@ public class DashboardService {
 
     private DashboardElectionType resolveElectionType(Candidate candidate) {
         for (DashboardElectionType electionType : DashboardElectionType.values()) {
-            if (electionType.getSgTypecode().equals(candidate.getSgTypecode())) {
+            if (electionType.getSgTypecode() != null
+                    && electionType.getSgTypecode().equals(candidate.getSgTypecode())) {
                 return electionType;
             }
         }

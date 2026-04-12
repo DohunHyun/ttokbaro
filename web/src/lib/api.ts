@@ -17,6 +17,43 @@ export type Evidence = {
   createdAt: string;
 };
 
+export type DashboardElectionOption = {
+  electionType: string;
+  label: string;
+  candidateCount: number;
+  available: boolean;
+};
+
+export type DashboardCandidateCard = {
+  id: number;
+  name: string;
+  partyName: string | null;
+  number: string | null;
+  photoUrl: string | null;
+  electionType: string | null;
+  region: string | null;
+  districtName: string | null;
+};
+
+export type DashboardCandidateDetail = {
+  id: number;
+  name: string;
+  partyName: string | null;
+  number: string | null;
+  photoUrl: string | null;
+  electionType: string | null;
+  region: string | null;
+  districtName: string | null;
+  age: string | null;
+  gender: string | null;
+  job: string | null;
+  education: string | null;
+  career: string | null;
+  homepageUrl: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+};
+
 export class ApiError extends Error {
   status: number;
 
@@ -129,6 +166,75 @@ export async function deleteEvidence(evidenceId: number): Promise<void> {
       "근거를 삭제하지 못했습니다.";
     throw new ApiError(message, response.status);
   }
+}
+
+export async function fetchSeoulDashboardElections(): Promise<
+  DashboardElectionOption[]
+> {
+  const response = await fetch(
+    `${API_BASE_URL}/dashboard/regions/seoul/elections`,
+    {
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    }
+  );
+
+  const body = await safeJson(response);
+  if (!response.ok) {
+    const message =
+      (body as { message?: string } | null)?.message ??
+      "선거 종류를 불러오지 못했습니다.";
+    throw new ApiError(message, response.status);
+  }
+
+  return body as DashboardElectionOption[];
+}
+
+export async function fetchDashboardCandidates(params: {
+  region: string;
+  electionType: string;
+}): Promise<DashboardCandidateCard[]> {
+  const searchParams = new URLSearchParams({
+    region: params.region,
+    electionType: params.electionType,
+  });
+
+  const response = await fetch(
+    `${API_BASE_URL}/dashboard/candidates?${searchParams.toString()}`,
+    {
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    }
+  );
+
+  const body = await safeJson(response);
+  if (!response.ok) {
+    const message =
+      (body as { message?: string } | null)?.message ??
+      "후보 목록을 불러오지 못했습니다.";
+    throw new ApiError(message, response.status);
+  }
+
+  return body as DashboardCandidateCard[];
+}
+
+export async function fetchDashboardCandidateById(
+  id: number
+): Promise<DashboardCandidateDetail> {
+  const response = await fetch(`${API_BASE_URL}/dashboard/candidates/${id}`, {
+    headers: { "Content-Type": "application/json" },
+    cache: "no-store",
+  });
+
+  const body = await safeJson(response);
+  if (!response.ok) {
+    const message =
+      (body as { message?: string } | null)?.message ??
+      "후보 상세를 불러오지 못했습니다.";
+    throw new ApiError(message, response.status);
+  }
+
+  return body as DashboardCandidateDetail;
 }
 
 async function safeJson(response: Response) {

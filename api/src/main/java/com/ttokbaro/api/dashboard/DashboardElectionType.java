@@ -3,10 +3,13 @@ package com.ttokbaro.api.dashboard;
 import java.util.Arrays;
 
 public enum DashboardElectionType {
+    SUPERINTENDENT("SUPERINTENDENT", null),
     MAYOR("MAYOR", 3),
-    DISTRICT_HEAD("DISTRICT_HEAD", 4),
-    CITY_COUNCIL("CITY_COUNCIL", 5),
-    DISTRICT_COUNCIL("DISTRICT_COUNCIL", 6);
+    DISTRICT_HEAD("DISTRICT_HEAD", null),
+    CITY_COUNCIL_DISTRICT("CITY_COUNCIL_DISTRICT", null),
+    CITY_COUNCIL_PR("CITY_COUNCIL_PR", null),
+    DISTRICT_COUNCIL_DISTRICT("DISTRICT_COUNCIL_DISTRICT", null),
+    DISTRICT_COUNCIL_PR("DISTRICT_COUNCIL_PR", null);
 
     private final String value;
     private final Integer sgTypecode;
